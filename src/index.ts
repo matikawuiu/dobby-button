@@ -38,6 +38,9 @@ async function wakeDobby(request: Request, env: Env): Promise<Response> {
       return new Response("Server not configured", { status: 500 });
     }
 
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000);
+
     const response = await fetch(WEBHOOK_URL, {
       method: "POST",
       headers: {
@@ -45,7 +48,10 @@ async function wakeDobby(request: Request, env: Env): Promise<Response> {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ text: "Добби, проснись! Это Макс (с сайта)" }),
+      signal: controller.signal,
     });
+
+    clearTimeout(timeoutId);
 
     const text = await response.text();
     const status = response.status;
@@ -58,9 +64,16 @@ async function wakeDobby(request: Request, env: Env): Promise<Response> {
       }
     );
   } catch (err: any) {
+    if (err.name === 'TimeoutError') {
+      return new Response(
+        JSON.stringify({ status: 504, body: 'Timeout: Webhook request timed out' }),
+        { status: 504, headers: { "Content-Type": "application/json" } }
+      );
+    }
+
     return new Response(
-      JSON.stringify({ status: 500, body: err.message }),
-      { status: 500, headers: { "Content-Type": "application/json" } }
+      JSON.stringify({ status: 502, body: 'Bad Gateway: Webhook request failed' }),
+      { status: 502, headers: { "Content-Type": "application/json" } }
     );
   }
 }
