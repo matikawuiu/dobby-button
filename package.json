@@ -1,0 +1,11 @@
+{
+  "name": "dobby-button",
+  "private": true,
+  "devDependencies": {
+    "wrangler": "^4.160.1"
+  },
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy"
+  }
+}

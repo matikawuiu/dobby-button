@@ -1,0 +1,23 @@
+name = "dobby-button"
+main = "src/index.ts"
+compatibility_date = "2024-01-01"
+
+[vars]
+# Канал webhook в Telegram (без slash /)
+WEBHOOK_URL = "YOUR_TELEGRAM_WEBHOOK_URL"
+
+[build]
+command = ""
+
+# Секция assets для обслуживания статических файлов из public/
+[assets]
+directory = "public"
+binding = "ASSETS"
+
+# Доступ к секретам через bindings
+[[env.production]]
+name = "production"
+vars = {}
+
+[[env.production.secrets]]
+WEBHOOK_TOKEN = ""
