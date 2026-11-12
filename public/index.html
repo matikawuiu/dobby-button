@@ -45,6 +45,7 @@
 </head>
 <body>
   <div id="app">
+    <input type="password" id="passwordInput" placeholder="Пароль" style="margin-bottom: 1rem; padding: 0.5rem; border-radius: 25px; border: 1px solid #ddd; font-size: 1rem;">
     <button class="button" id="wakeButton">Разбудить Доббу</button>
     <div id="result"></div>
   </div>
@@ -62,12 +63,24 @@
       result.className = '';
 
       try {
-        const response = await fetch('/api/wake', { method: 'POST' });
+        const response = await fetch('/api/wake', { 
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ 
+            password: document.getElementById('passwordInput').value 
+          })
+        });
+
         const data = await response.json();
 
         if (response.ok) {
           result.textContent = 'Добба разбужен ✅';
           result.className = 'success';
+        } else if (response.status === 401) {
+          result.textContent = 'Неверный пароль';
+          result.className = 'error';
         } else {
           result.textContent = `Ошибка: ${data.body}`;
           result.className = 'error';
