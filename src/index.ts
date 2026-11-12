@@ -1,9 +1,10 @@
-import type { ExecutionContext } from '@cloudflare/workers-types';
+import type { ExecutionContext, KVNamespace } from '@cloudflare/workers-types';
 
 export interface Env {
   WEBHOOK_URL: string;
   WEBHOOK_TOKEN: string;
   SITE_PASSWORD?: string;
+  LOCK: KVNamespace;
 }
 
 export default {
@@ -43,6 +44,20 @@ async function wakeDobby(request: Request, env: Env): Promise<Response> {
         headers: { "Content-Type": "application/json" },
       });
     }
+
+    // Rate limiting check
+    const lastWake = await env.LOCK.get("last_wake");
+    if (lastWake) {
+      return new Response(JSON.stringify({ error: "too soon" }), {
+        status: 429,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+
+    // Set rate limit and continue
+    await env.LOCK.put("last_wake", Date.now().toString(), {
+      expirationTtl: 300
+    });
 
     const { WEBHOOK_URL, WEBHOOK_TOKEN } = env;
 

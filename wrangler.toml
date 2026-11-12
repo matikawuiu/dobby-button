@@ -6,3 +6,7 @@ compatibility_date = "2024-01-01"
 [assets]
 directory = "public"
 binding = "ASSETS"
+
+[[kv_namespaces]]
+binding = "LOCK"
+id = "d0f01f86942b4735806de43706"

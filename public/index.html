@@ -55,7 +55,7 @@
     const result = document.getElementById('result');
 
     button.addEventListener('click', async () => {
-      if (!confirm('Точно разбудить?')) {
+      if (!confirm('Точно разбудить Доббу?')) {
         return;
       }
 
@@ -80,6 +80,9 @@
           result.className = 'success';
         } else if (response.status === 401) {
           result.textContent = 'Неверный пароль';
+          result.className = 'error';
+        } else if (response.status === 429) {
+          result.textContent = 'Добби уже будили, подожди 5 минут';
           result.className = 'error';
         } else {
           result.textContent = `Ошибка: ${data.body}`;
