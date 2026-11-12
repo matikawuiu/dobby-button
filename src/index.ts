@@ -33,17 +33,15 @@ export default {
 
 async function wakeDobby(request: Request, env: Env): Promise<Response> {
   try {
-    // Проверка пароля
+    // Проверка пароля "закрытой по умолчанию"
     const body = await request.json() as { password?: string };
     const { password } = body;
 
-    if (env.SITE_PASSWORD) {
-      if (!password || password !== env.SITE_PASSWORD) {
-        return new Response(JSON.stringify({ error: "wrong password" }), {
-          status: 401,
-          headers: { "Content-Type": "application/json" },
-        });
-      }
+    if (!env.SITE_PASSWORD || !password || password !== env.SITE_PASSWORD) {
+      return new Response(JSON.stringify({ error: "wrong password" }), {
+        status: 401,
+        headers: { "Content-Type": "application/json" },
+      });
     }
 
     const { WEBHOOK_URL, WEBHOOK_TOKEN } = env;
